@@ -1,18 +1,26 @@
 # From official php image.
-FROM php:cli-alpine
-# Create a user group and account under id 1000.
-RUN addgroup -g 1000 -S user && adduser -u 1000 -D user -G user
-# Install quality-of-life packages.
-RUN apk add --no-cache bash curl git vim
-# Install composer for php deps.
-RUN apk add --no-cache composer
-# Install postgres pdo driver.
-RUN apk add --no-cache postgresql-dev && docker-php-ext-install pdo_pgsql
-# Install redis driver.
-RUN mkdir -p /usr/src/php/ext/redis; \
-    curl -fsSL --ipv4 https://github.com/phpredis/phpredis/archive/5.3.4.tar.gz | tar xvz -C "/usr/src/php/ext/redis" --strip 1; \
-    docker-php-ext-install redis
-# Install nodejs and npm for frontend.
-RUN apk add --no-cache nodejs npm
+FROM php:cli
+
+RUN addgroup --gid 1000 user && adduser --uid 1000 --gid 1000 user
+RUN apt update -y && apt install -y zip git libpq-dev && apt clean
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+    && php composer-setup.php \
+    && php -r "unlink('composer-setup.php');" \
+    && mv composer.phar /usr/local/bin/composer
+
+RUN docker-php-ext-install \
+    bcmath \
+    ctype \
+    pdo \
+    pdo_pgsql \
+    && pecl install redis
+
+RUN docker-php-ext-enable \
+    bcmath \
+    ctype \
+    pdo \
+    pdo_pgsql \
+    redis
 # Prevent container from exiting early.
 CMD ["sleep", "infinity"]
