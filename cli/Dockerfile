@@ -1,5 +1,5 @@
 # From official php image.
-FROM php:cli
+FROM php:7.4-cli
 
 RUN addgroup --gid 1000 user && adduser --uid 1000 --gid 1000 user
 RUN apt update -y && apt install -y zip git libpq-dev && apt clean
