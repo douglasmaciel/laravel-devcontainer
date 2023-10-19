@@ -24,5 +24,7 @@ RUN docker-php-ext-enable \
     pdo \
     pdo_pgsql \
     redis
+
+RUN npm i -g yarn
 # Prevent container from exiting early.
 CMD ["sleep", "infinity"]
