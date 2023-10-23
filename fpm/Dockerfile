@@ -7,6 +7,7 @@ RUN docker-php-ext-install \
     ctype \
     pdo \
     pdo_pgsql \
+    pdo_mysql \
     && pecl install redis
 
 RUN docker-php-ext-enable \
@@ -14,4 +15,5 @@ RUN docker-php-ext-enable \
     ctype \
     pdo \
     pdo_pgsql \
+    pdo_mysql \
     redis
